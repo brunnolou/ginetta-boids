@@ -32,3 +32,6 @@ a {
 	margin-bottom: 0.5em;
 	font-size: 14px;
 }
+canvas {
+	background: #000;
+}
