@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
+import logo from "./img/ginetta-logo.svg";
+import gradient from "./img/ginetta-gradient.png";
+import icon from "./img/ginetta-icon.svg";
 import { calc, transform } from "popmotion";
 import "./App.css";
 var fps = require("fps"),
@@ -8,6 +10,8 @@ var fps = require("fps"),
   Boids = require("boids");
 
 const pt = (x, y) => ({ x, y });
+
+let mode = 1;
 
 const speedLimit = 0.6;
 const accelerationLimit = 8;
@@ -18,8 +22,14 @@ const choesionForce = 0.9; // Speed to move towards other boids
 const separationDistance = 8; // Radius at which boids avoid others
 const separationForce = 1; // Speed to avoid at
 
-const hueRotate = transform.interpolate([0, 360], [300, 250]);
-const brightnessRotate = transform.interpolate([0, speedLimit], [10, 44]);
+const hueRotate = transform.interpolate([0, 360], [290, 240]);
+
+// const hueRotate = transform.interpolate(
+//   [0, 90, 300, 360],
+//   [300, 250, 140, 200]
+// );
+
+const brightnessBySpeed = transform.interpolate([0, speedLimit], [10, 44]);
 const progressFromCenter = transform.interpolate(
   [0, alignmentDistance * 0.6, alignmentDistance],
   [1, 1, 0.7]
@@ -30,8 +40,19 @@ const saturationRotate = transform.interpolate(
 );
 
 const lightRotate = transform.interpolate(
-  [0, 360 / 8, 360 / 7, 360 / 6, 360 / 5, 360 / 4, 360 / 3, 360 / 2, 360],
-  [.5, 0, .5, 0, .5, 0, .5, 0, .5]
+  [
+    0,
+    360 / 9,
+    360 / 8,
+    360 / 7,
+    360 / 6,
+    360 / 5,
+    360 / 4,
+    360 / 3,
+    360 / 2,
+    360
+  ],
+  [0, -0.1, 0, -0.1, 0, -0.1, 0, -0.1, 0, -0.1]
 );
 
 class App extends Component {
@@ -82,6 +103,9 @@ class App extends Component {
       attractors[0][3] = accelerationLimit;
       attractors[0][4] = 40;
     };
+    document.body.ondblclick = e => {
+      mode = !mode;
+    };
 
     window.onresize = debounce(function() {
       canvas.width = window.innerWidth;
@@ -91,12 +115,11 @@ class App extends Component {
 
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.appendChild(canvas);
 
     const halfHeight = canvas.height / 2;
     const halfWidth = canvas.width / 2;
 
-    ticker(window, 260)
+    ticker(window, 60)
       .on("tick", function() {
         frames.tick();
         boids.tick();
@@ -104,11 +127,8 @@ class App extends Component {
       .on("draw", function() {
         var boidData = boids.boids;
 
-        ctx.fillStyle = "rgba(0,0,0,.041)"; // '#FFF1EB'
+        ctx.fillStyle = mode ? "rgba(0,0,0,.0241)" : "rgba(0,0,0,.041)"; // '#FFF1EB'
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // ctx.fillStyle = "red";
-        // ctx.fillRect(halfWidth, halfHeight, 10, 10);
 
         const boid0 = boidData[0];
 
@@ -125,6 +145,8 @@ class App extends Component {
         // for (var i = 0, l = 1, x, y; i < l; i += 1) {
         for (var i = 0, l = boidData.length, x, y; i < l; i += 1) {
           const boid = boidData[i];
+          const boidSize = mode ? 5 : 2;
+
           x = boid[0];
           y = boid[1];
           // wrap around the screen
@@ -153,14 +175,10 @@ class App extends Component {
             ", " +
             saturationRotate(acceleration) +
             "%, " +
-            brightnessRotate(speed) *
-              progressFromCenter(distanceFromOrigin) *
-              (1 + lightRotate(angle)) +
+            brightnessBySpeed(speed) * progressFromCenter(distanceFromOrigin) +
             "%)";
 
-          ctx.fillRect(x + halfWidth, y + halfHeight, 2, 2);
-
-          //
+          ctx.fillRect(x + halfWidth, y + halfHeight, boidSize, boidSize);
         }
       });
 
@@ -187,19 +205,27 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">FPS {this.state.frames}</h1>
-        </header>
-        <p className="App-intro">
+        <span className="App-fps">FPS {this.state.frames}</span>
+        <div className="App-intro">
           <canvas
             key="canvas"
+            className={mode ? "blur" : ""}
             ref={node => {
               this.canvas = node;
               //
             }}
           />
-        </p>
+        </div>
+        {mode ? (
+          <React.Fragment>
+            <div className="App-icon-bg">
+              <img class="App-icon" src={icon} />
+            </div>
+            <img class="App-icon-transparent" src={icon} />
+          </React.Fragment>
+        ) : null}
+        {/* <img class="App-gradient" src={gradient} /> */}
+        <img class="App-logo" src={logo} />
       </div>
     );
   }
