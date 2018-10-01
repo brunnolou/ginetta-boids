@@ -87,25 +87,38 @@ class App extends Component {
         attractors: attractors
       });
 
-    document.body.onmousemove = function(e) {
+    function move(e) {
       var halfHeight = canvas.height / 2,
         halfWidth = canvas.width / 2;
 
       attractors[0][0] = e.x - halfWidth;
       attractors[0][1] = e.y - halfHeight;
-    };
+    }
 
-    document.body.onmousedown = e => {
+    const down = e => {
+      e.preventDefault();
       attractors[0][3] = accelerationLimit * 1.5;
       attractors[0][4] = 250;
     };
-    document.body.onmouseup = e => {
+
+    const up = e => {
+      e.preventDefault();
       attractors[0][3] = accelerationLimit;
       attractors[0][4] = 40;
     };
-    document.body.ondblclick = e => {
+
+    const changeMode = e => {
       mode = !mode;
     };
+
+    document.addEventListener("touchstart", changeMode, false);
+    document.addEventListener("touchend", up, false);
+    document.addEventListener("touchmove", move, false);
+
+    document.body.onmousemove = move;
+    document.body.onmousedown = down;
+    document.body.onmouseup = up;
+    document.body.ondblclick = changeMode;
 
     window.onresize = debounce(function() {
       canvas.width = window.innerWidth;
@@ -131,8 +144,6 @@ class App extends Component {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const boid0 = boidData[0];
-
-        //
 
         // const direction = calc.pointFromAngleAndDistance(
         //   pt(boid0[0] + halfWidth + boid0[0], boid0[1] + halfHeight + boid0[1]),
@@ -218,14 +229,20 @@ class App extends Component {
         </div>
         {mode ? (
           <React.Fragment>
+            <img class="App-icon-transparent" src={icon} />
             <div className="App-icon-bg">
               <img class="App-icon" src={icon} />
             </div>
-            <img class="App-icon-transparent" src={icon} />
           </React.Fragment>
         ) : null}
         {/* <img class="App-gradient" src={gradient} /> */}
-        <img class="App-logo" src={logo} />
+        <img
+          class="App-logo"
+          src={logo}
+          onClick={() => {
+            mode = !mode;
+          }}
+        />
       </div>
     );
   }

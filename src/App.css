@@ -1,6 +1,7 @@
 .App {
   text-align: center;
   pointer-events: none;
+  touch-action: none;
   user-select: none;
 }
 
@@ -18,8 +19,12 @@
   bottom: 0;
   right: 0;
   transform: translate(-10%, -40%);
-  max-width: 16vw;
+  max-width: 10rem;
+  width: 100%;
   min-width: 8rem;
+  pointer-events: all;
+  touch-action: all;
+  user-select: all;
 }
 
 .App-gradient {
@@ -41,9 +46,11 @@
   transform: translate(-50%, -50%);
   width: 180px;
   pointer-events: none;
+  touch-action: none;
+  user-select: none;
 }
 .App-icon-transparent {
-  opacity: 0.03;
+  opacity: 0.06;
 }
 
 .App-icon-bg {
@@ -56,6 +63,8 @@
   background-color: #000;
   mix-blend-mode: multiply;
   pointer-events: none;
+  touch-action: none;
+  user-select: none;
 }
 
 canvas {
